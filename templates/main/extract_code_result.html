@@ -1,0 +1,26 @@
+
+{% extends '../base.html' %}
+{% block head %} 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js">    </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var clipboard = new ClipboardJS('.btn-copy');
+
+        clipboard.on('success', function (e) {
+            e.clearSelection();
+        });
+    });
+</script>
+{% endblock %}
+{% block title %}Resultado{% endblock %}
+{% block content %}
+
+<div class="container mt-5 result-container">
+    <h1>Resultado</h1>
+    <a href="{% url 'extract_code' %}" class="btn btn-primary mr-2">Nova Extração</a>
+    <button class="btn btn-success btn-copy" data-clipboard-target="#result">Copiar</button>
+    <p></p>
+    <p id="result">{{ result }}</p>
+</div>
+
+{% endblock %}

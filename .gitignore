@@ -1,0 +1,38 @@
+# .gitignore
+
+# Arquivos e diretórios específicos do Django
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+*.sqlite3
+*.pyc
+
+# Ambiente virtual (pasta geralmente chamada 'venv' ou 'env')
+venv/
+env/
+
+# Arquivos de configuração locais
+*.env
+*.env.*
+*.local
+
+# Arquivos de logs
+*.log
+
+# Arquivos de mídia (uploads de usuários, por exemplo)
+media/
+
+# Arquivos de dados temporários
+*.db
+*.sqlite
+
+# Arquivos de configuração específicos para IDEs
+.idea/
+.vscode/
+
+# Outros arquivos temporários
+*.swp
+*~
+.DS_Store

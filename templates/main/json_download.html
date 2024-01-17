@@ -1,0 +1,15 @@
+{% extends '../base.html' %}
+{% block title %}Download{% endblock %}
+{% block content %}
+
+<div class="text-center">
+    <form method="post" action="{% url 'json_download' nome_arquivo %}">
+        {% csrf_token %}
+        <h1>Download do Arquivo JSON</h1>
+        <p>O JSON foi salvo no arquivo <strong>{{ nome_arquivo }}</strong>.</p>
+        <p> <button type="submit" class="btn btn-success">Baixar</button></p>
+        <p><a href="{% url 'format_json' %}" class="btn btn-primary">Formatar Novo Arquivo JSON</a></p>
+    </form>
+</div>
+
+{% endblock %}

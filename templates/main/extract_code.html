@@ -1,0 +1,24 @@
+
+{% extends '../base.html' %}
+{% block title %}format json{% endblock %}
+{% block content %}
+
+    <div class="container mt-5">
+        <h1>Extrair Códigos</h1>
+        <form method="post" action="{% url 'extract_code' %}">
+            {% csrf_token %}
+            <label for="regex">Escolha a expressão regular:</label>
+            <select class="form-control" id="regex" name="regex">
+                {% for regex_item in regex_list %}
+                    <option value="{{ regex_item.id }}">{{ regex_item.name }}</option>
+                {% endfor %}
+            </select>
+            <div class="form-group">
+                <label for="dados">Cole seus dados aqui:</label>
+                <textarea class="form-control" id="data" name="data" rows="10" placeholder="Cole seus dados aqui"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Extrair</button>
+        </form>
+    </div>
+
+{% endblock %}
