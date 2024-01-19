@@ -16,11 +16,24 @@
 {% block content %}
 
 <div class="container mt-5 result-container">
-    <h1>Resultado</h1>
-    <a href="{% url 'extract_code' %}" class="btn btn-primary mr-2">Nova Extração</a>
-    <button class="btn btn-success btn-copy" data-clipboard-target="#result">Copiar</button>
-    <p></p>
-    <p id="result">{{ result }}</p>
+    <h1 class="mb-4">Resultado</h1>
+
+    {% if result %}
+        <p id="result">{{ result }}</p>
+        <form method="post" action="{% url 'download' nome_arquivo %}">
+            {% csrf_token %}
+            
+            <button type="submit" class="btn btn-success mr-2">Baixar CSV</button>
+
+            <button class="btn btn-success btn-copy" data-clipboard-target="#result">Copiar</button>
+        </form>
+    {% else %}
+        <p>Nenhum resultado disponível.</p>
+    {% endif %}
+
+    <hr class="my-4">
+
+    <a href="{% url 'extract_code' %}" class="btn btn-primary">Nova Extração</a>
 </div>
 
 {% endblock %}

@@ -12,9 +12,8 @@ urlpatterns = [
 url_main = [
     path('', views.home, name='home'),
     path('extract_code/', views.extract_code, name='extract_code'),
+    path('download/<str:nome_arquivo>/', views.download, name='download'),
     path('format_json/', views.format_json, name='format_json'),
-    path('json_download/', views.json_download, name='json_download_post'),
-    path('json_download/<str:nome_arquivo>/', views.json_download, name='json_download'),
 ]
 
 urlpatterns += url_main
