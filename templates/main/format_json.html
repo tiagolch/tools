@@ -7,14 +7,26 @@
     <form method="post" action="{% url 'format_json' %}">
         {% csrf_token %}
         <div class="form-group">
-            <label for="texto">Texto:</label>
-            <textarea class="form-control" name="texto" rows="4" required></textarea>
+            <label for="API">API:</label>
+            <textarea class="form-control" name="API" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="PAYLOAD">PAYLOAD:</label>
+            <textarea class="form-control" name="PAYLOAD" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="RESPONSE">RESPONSE:</label>
+            <textarea class="form-control" name="RESPONSE" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="PERSISTENCIA">PERSISTENCIA:</label>
+            <textarea class="form-control" name="PERSISTENCIA" rows="4" required></textarea>
         </div>
         <div class="form-group">
             <label for="nome_arquivo">Nome do Arquivo:</label>
             <input type="text" class="form-control" name="nome_arquivo" required>
         </div>
-        <button type="submit" class="btn btn-primary">Converter</button>
+        <button type="submit" class="btn btn-primary">Formatar</button>
     </form>
 </div>
 
