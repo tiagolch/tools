@@ -3,13 +3,16 @@
 {% block content %}
 
 <div class="text-center">
+    <h1>Download do Arquivo JSON</h1>
+    {% for nome_arquivo in nomes_arquivos_validos %}
     <form method="post" action="{% url 'download' nome_arquivo %}">
         {% csrf_token %}
-        <h1>Download do Arquivo JSON</h1>
-        <p>O JSON foi salvo no arquivo <strong>{{ nome_arquivo }}</strong>.</p>
-        <p> <button type="submit" class="btn btn-success">Baixar</button></p>
-        <p><a href="{% url 'format_json' %}" class="btn btn-primary">Formatar Novo Arquivo JSON</a></p>
+        <p>Arquivo: {{ nome_arquivo }}</p>
+        <button type="submit" class="btn btn-success">Baixar</button>
     </form>
+    {% endfor %}
+    <br>
+    <p><a href="{% url 'format_json' %}" class="btn btn-primary">Formatar Novo Arquivo JSON</a></p>
 </div>
 
 {% endblock %}

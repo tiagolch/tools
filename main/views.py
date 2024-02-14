@@ -1,6 +1,7 @@
+import zipfile
 from django.shortcuts import render
 from .models import FormatJson, Regex
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from wsgiref.util import FileWrapper
 import re
 import json
@@ -10,12 +11,13 @@ from django.db import connections
 from datetime import datetime, timedelta
 
 
+
 def home(request):
     return render(request, 'main/home.html')
 
 
 def extract_code(request):
-    regex_list = Regex.objects.all()
+    regex_list = Regex.objects.filter(active=True)
     context = {'regex_list': regex_list}
 
     if request.method == 'POST':
@@ -25,39 +27,44 @@ def extract_code(request):
         regex = Regex.objects.get(id=int(regex_id))
 
         schema = re.compile(f"{regex.regex}")
+        schema2 = re.compile('ARQT\d+tx')
 
         codes = schema.findall(data)
+        codes += schema2.findall(data)
+        print(codes)
 
         result = ', '.join(f'"{code}"' for code in codes)
-        response, nome_arquivo = execute_sql_and_export_csv(result)
+        response, nome_arquivo = execute_sql_and_export_csv(result, regex_id)
         context = {'result': result, 'nome_arquivo': nome_arquivo}
 
         return render(request, 'main/extract_code_result.html', context)
 
     return render(request, 'main/extract_code.html', context)
 
-
 def download(request, nome_arquivo):
-    caminho_arquivo = os.path.join(os.getcwd(), nome_arquivo)
     try:
+        caminho_arquivo = os.path.join(os.getcwd(), nome_arquivo)
         if os.path.exists(caminho_arquivo):
             with open(caminho_arquivo, 'rb') as arquivo:
-                resposta = HttpResponse(FileWrapper(
-                    arquivo), content_type='application/force-download')
-                resposta[
-                    'Content-Disposition'] = f'attachment; filename={os.path.basename(caminho_arquivo)}'
+                resposta = HttpResponse(FileWrapper(arquivo), content_type='application/octet-stream')
+                resposta['Content-Disposition'] = f'attachment; filename="{os.path.basename(caminho_arquivo)}"'
                 os.remove(caminho_arquivo)
                 return resposta
         else:
-            return HttpResponse('O arquivo não foi encontrado.', status=404)
+            return HttpResponseNotFound('O arquivo não foi encontrado.')
     except Exception as e:
-        return HttpResponse(f'Ocorreu um erro: {str(e)}', status=500)
+        return HttpResponseServerError(f'Ocorreu um erro: {str(e)}')
 
 
-def query(awbs):
+def query(regex, regex_id):
     data_hoje = datetime.now()
     data_hoje_menos_30_dias = data_hoje - timedelta(days=30)
     data_formatada = data_hoje_menos_30_dias.strftime('%Y-%m-%d')
+
+    if regex_id == '1':
+        awbOuNumeroPedido = f'and awb in ({regex})'
+    else:
+        awbOuNumeroPedido = f'and e.pedido in ({regex})'
 
     sql = f"""
     Select
@@ -167,17 +174,18 @@ From corrier_fat.fat_cte cte
     inner join corrier_fat.fat_cte_tributos_impostos imp using (fatctetrib_id)
     inner join corrier_fat.fat_cte_status status using (fatctestat_id)
 where 1=1
-	and awb in ({awbs})
+	{awbOuNumeroPedido}
     and cteComp.fatctetribcom_motorfiscal = 'IDT'
     and imp.fatctetribimp_imposto = 'ICMS'
     and cte.fatcte_data >= {str(data_formatada)}     
 order by awb
 """
+    
     return sql
 
 
-def execute_sql_and_export_csv(awbs):
-    sql_query = query(awbs)
+def execute_sql_and_export_csv(regex, regex_id):
+    sql_query = query(regex, regex_id)
     try:
         with connections['external_database'].cursor() as cursor:
             cursor.execute(sql_query)
@@ -200,19 +208,44 @@ def execute_sql_and_export_csv(awbs):
 
 def format_json(request):
     if request.method == 'POST':
-        texto = request.POST.get('texto')
-        json_string = texto_para_json(texto)
+        api = request.POST.get('API', '')
+        payload = request.POST.get('PAYLOAD', '')
+        response = request.POST.get('RESPONSE', '')
+        persistencia = request.POST.get('PERSISTENCIA', '')
         nome_arquivo = request.POST.get('nome_arquivo')
 
-        if not nome_arquivo.endswith('.json'):
-            nome_arquivo += '.json'
+        nome_api = nome_arquivo + '_api.json'
+        nome_payload = nome_arquivo + '_payload.json'
+        nome_response = nome_arquivo + '_response.json'
+        nome_persistencia = nome_arquivo + '_persistencia.json'
 
-        salvar_json_em_arquivo(json_string, nome_arquivo)
+        nomes_arquivos = []
+        if api:
+            json_api = texto_para_json(api)
+            salvar_json_em_arquivo(json_api, nome_api)
+            FormatJson.objects.create(name=nome_api, json=json_api)
+            nomes_arquivos.append(nome_api)
+        if payload:
+            json_payload = texto_para_json(payload)
+            salvar_json_em_arquivo(json_payload, nome_payload)
+            FormatJson.objects.create(name=nome_payload, json=json_payload)
+            nomes_arquivos.append(nome_payload)
+        if response:
+            json_response = texto_para_json(response)
+            salvar_json_em_arquivo(json_response, nome_response)
+            FormatJson.objects.create(name=nome_response, json=json_response)
+            nomes_arquivos.append(nome_response)
+        if persistencia:
+            json_persistencia = texto_para_json(persistencia)
+            salvar_json_em_arquivo(json_persistencia, nome_persistencia)
+            FormatJson.objects.create(name=nome_persistencia, json=json_persistencia)
+            nomes_arquivos.append(nome_persistencia)
 
-        FormatJson.objects.create(name=nome_arquivo, json=json_string)
-
-        return render(request, 'main/json_download.html', {'nome_arquivo': nome_arquivo})
+        nomes_arquivos_validos = [nome for nome in nomes_arquivos if nome]
+        return render(request, 'main/json_download.html', {'nomes_arquivos_validos': nomes_arquivos_validos})
+    
     return render(request, 'main/format_json.html')
+
 
 
 def texto_para_json(texto):
