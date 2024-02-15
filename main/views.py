@@ -11,7 +11,6 @@ from django.db import connections
 from datetime import datetime, timedelta
 
 
-
 def home(request):
     return render(request, 'main/home.html')
 
@@ -41,13 +40,16 @@ def extract_code(request):
 
     return render(request, 'main/extract_code.html', context)
 
+
 def download(request, nome_arquivo):
     try:
         caminho_arquivo = os.path.join(os.getcwd(), nome_arquivo)
         if os.path.exists(caminho_arquivo):
             with open(caminho_arquivo, 'rb') as arquivo:
-                resposta = HttpResponse(FileWrapper(arquivo), content_type='application/octet-stream')
-                resposta['Content-Disposition'] = f'attachment; filename="{os.path.basename(caminho_arquivo)}"'
+                resposta = HttpResponse(FileWrapper(
+                    arquivo), content_type='application/octet-stream')
+                resposta[
+                    'Content-Disposition'] = f'attachment; filename="{os.path.basename(caminho_arquivo)}"'
                 os.remove(caminho_arquivo)
                 return resposta
         else:
@@ -180,7 +182,7 @@ where 1=1
     and cte.fatcte_data >= {str(data_formatada)}     
 order by awb
 """
-    
+
     return sql
 
 
@@ -238,14 +240,14 @@ def format_json(request):
         if persistencia:
             json_persistencia = texto_para_json(persistencia)
             salvar_json_em_arquivo(json_persistencia, nome_persistencia)
-            FormatJson.objects.create(name=nome_persistencia, json=json_persistencia)
+            FormatJson.objects.create(
+                name=nome_persistencia, json=json_persistencia)
             nomes_arquivos.append(nome_persistencia)
 
         nomes_arquivos_validos = [nome for nome in nomes_arquivos if nome]
         return render(request, 'main/json_download.html', {'nomes_arquivos_validos': nomes_arquivos_validos})
-    
-    return render(request, 'main/format_json.html')
 
+    return render(request, 'main/format_json.html')
 
 
 def texto_para_json(texto):
