@@ -1,4 +1,3 @@
-import zipfile
 from django.shortcuts import render
 from .models import FormatJson, Regex
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
@@ -256,7 +255,7 @@ def texto_para_json(texto):
     texto = texto.replace("False", "false")
 
     try:
-        return json.loads(json.dumps(texto, indent=2, ensure_ascii=False))
+        return json.dumps(json.loads(texto), indent=2)
     except json.JSONDecodeError:
         print('ERRROOOOOOOOOO')
         texto_corrigido = texto.replace("'", '"')
