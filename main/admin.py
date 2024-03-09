@@ -11,7 +11,7 @@ class RegexAdmin(admin.ModelAdmin):
 
 @admin.register(FormatJson)
 class FormatJsonAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['name', 'created_at']
     list_filter = ['created_at']
     search_fields = ['name']
 
