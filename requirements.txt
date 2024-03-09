@@ -3,7 +3,9 @@ certifi==2023.11.17
 Django==5.0.1
 gunicorn==21.2.0
 h11==0.14.0
+numpy==1.26.3
 packaging==23.2
+pandas==2.1.4
 pyaes==1.6.1
 python-dateutil==2.8.2
 python-decouple==3.8
