@@ -3,10 +3,14 @@ from django.urls import path
 from main import views
 from django.conf.urls.static import static
 from django.conf import settings
+from .api import api
+from mocks.views import mock
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("api/", api.urls),
+    path("mocks/", mock.urls),
 ]
 
 url_main = [
