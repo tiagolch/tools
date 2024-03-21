@@ -25,10 +25,10 @@ def extract_code(request):
         regex = Regex.objects.get(id=int(regex_id))
 
         schema = re.compile(f"{regex.regex}")
-        schema2 = re.compile('ARQT\d+tx')
+        #schema2 = re.compile('[A-Za-z]{4}\d+tx')
 
         codes = schema.findall(data)
-        codes += schema2.findall(data)
+        #codes += schema2.findall(data)
         print(codes)
 
         result = ', '.join(f'"{code}"' for code in codes)
@@ -68,7 +68,7 @@ def query(regex, regex_id):
         awbOuNumeroPedido = f'and e.pedido in ({regex})'
 
     sql = f"""
-    Select
+Select
     cte.fatctestat_id as 'Cod Status',
     status.fatctestat_nome 'Status',
     rem.doc_fiscal_cte as 'Cod CTe_Tipo no cad Rem',
@@ -131,8 +131,26 @@ def query(regex, regex_id):
     cte.fatcte_total_prestacao as 'Total Prestacao',
     cte.fatcte_classificacao_tributaria as 'Classificacao Tributaria',
     cte.fatcte_base_calculo as 'Base Calculo',
-    cte.fatcte_aliquota as Aliquota,
-    cte.fatcte_valor_icms as 'Valor ICMS',
+    cte.fatcte_aliquota as 'ICMS Aliquota',
+    cte.fatcte_valor_icms as 'ICMS Valor',
+    (
+    IF(icmsuffim.fatctetribimp_aliquota <> 0, icmsuffim.fatctetribimp_aliquota, 0)
+    ) as 'ICMSUFFIM Aliquota',
+    (
+    IF(icmsuffim.fatctetribimp_valor <> 0, icmsuffim.fatctetribimp_valor, 0)
+    ) as 'ICMSUFFIM Valor',
+    (
+    IF(fcpuffim.fatctetribimp_aliquota <> 0, icmsuffim.fatctetribimp_aliquota, 0)
+    ) as 'FCPUFFIM Aliquota',
+    (
+    IF(fcpuffim.fatctetribimp_valor <> 0, icmsuffim.fatctetribimp_valor, 0)
+    ) as 'FCPUFFIM Valor',
+    (
+    IF(icmsinter.fatctetribimp_aliquota <> 0, icmsuffim.fatctetribimp_aliquota, 0)
+    ) as 'ICMSINTER Aliquota',
+    (
+    IF(icmsinter.fatctetribimp_valor <> 0, icmsuffim.fatctetribimp_valor, 0)
+    ) as 'ICMSINTER Valor',
     cte.fatcte_valor_mercadoria as 'Valor Mercadoria',
     cte.fatcte_natureza as Natureza,
     cte.fatcte_peso as Peso,
@@ -166,18 +184,19 @@ def query(regex, regex_id):
     cte.fatcte_tomador_fantasia as 'Tomador Fantasia',
     cte.fatcte_tomador_municipio as 'Tomador Municipio',
     cte.fatcte_tomador_uf as 'Tomador UF'
-# Select count(*), awb
 From corrier_fat.fat_cte cte
     inner join corrier.encomendas e using(encoid)
     inner join corrier_fat.fat_cte_tributos cteTrib using (fatcte_id)
     inner join corrier_fat.fat_cte_tributos_complemento cteComp using (fatctetrib_id)
     inner join corrier.remetentes rem on e.reid = rem.reid
-    inner join corrier_fat.fat_cte_tributos_impostos imp using (fatctetrib_id)
+    inner join corrier_fat.fat_cte_tributos_impostos imp on cteTrib.fatctetrib_id = imp.fatctetrib_id and imp.fatctetribimp_imposto = 'ICMS'
+    left JOIN corrier_fat.fat_cte_tributos_impostos icmsuffim on imp.fatctetrib_id = icmsuffim.fatctetrib_id  and icmsuffim.fatctetribimp_imposto = 'ICMSUFFIM'
+    left JOIN corrier_fat.fat_cte_tributos_impostos fcpuffim on imp.fatctetrib_id = fcpuffim.fatctetrib_id  and fcpuffim.fatctetribimp_imposto = 'FCPUFFIM'
+    left JOIN corrier_fat.fat_cte_tributos_impostos icmsinter on imp.fatctetrib_id = icmsinter.fatctetrib_id  and icmsinter.fatctetribimp_imposto = 'ICMSINTER'
     inner join corrier_fat.fat_cte_status status using (fatctestat_id)
 where 1=1
 	{awbOuNumeroPedido}
     and cteComp.fatctetribcom_motorfiscal = 'IDT'
-    and imp.fatctetribimp_imposto = 'ICMS'
     and cte.fatcte_data >= {str(data_formatada)}     
 order by awb
 """
