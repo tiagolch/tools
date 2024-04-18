@@ -233,6 +233,9 @@ def format_json(request):
         response = request.POST.get('RESPONSE', '')
         persistencia = request.POST.get('PERSISTENCIA', '')
         nome_arquivo = request.POST.get('nome_arquivo')
+        devolucao = request.POST.get('devolucao')
+
+        nome_arquivo = nome_arquivo + '_devolucao' if devolucao else nome_arquivo + '_normal'
 
         nome_api = nome_arquivo + '_api.json'
         nome_payload = nome_arquivo + '_payload.json'

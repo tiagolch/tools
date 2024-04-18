@@ -25,4 +25,3 @@ Apos clonar o projeto seguir passos abaixo:
 ### Inicie o servidor:
     python manage.py runserver
 
-
