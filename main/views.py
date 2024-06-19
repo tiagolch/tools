@@ -229,7 +229,7 @@ def execute_sql_and_export_csv(regex, regex_id, option):
         df = pd.DataFrame(data, columns=columns)
 
         csv_filename = f'{datetime.today()}.csv'
-        df.to_csv(csv_filename, index=False)
+        df.to_csv(csv_filename, sep=';', index=False)
 
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = f'attachment; filename="{csv_filename}"'
