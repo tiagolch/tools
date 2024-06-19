@@ -4,7 +4,7 @@
 
 <div class="text-center">
     <h1>Formatar JSON</h1>
-    <form method="post" action="{% url 'format_json' %}">
+    <form method="post" action="{% url 'format_json' %}" class=" align-items-center">
         {% csrf_token %}
         <div class="form-group">
             <label for="API">API:</label>
@@ -26,9 +26,9 @@
             <label for="nome_arquivo">Nome do Arquivo:</label>
             <input type="text" class="form-control" name="nome_arquivo" required>
         </div>
-        <div class="form-group">
-            <label for="devolucao">Devolução?</label>
-            <input type="checkbox" name="devolucao">
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" name="devolucao" id="devolucao">
+            <label class="form-check-label" for="devolucao">Devolução?</label>
         </div>
         <button type="submit" class="btn btn-primary">Formatar</button>
     </form>
