@@ -21,6 +21,7 @@ def extract_code(request):
     if request.method == 'POST':
         regex_id = request.POST.get('regex')
         data = request.POST.get('data')
+        option = request.POST.get('option')
 
         regex = Regex.objects.get(id=int(regex_id))
 
@@ -32,12 +33,15 @@ def extract_code(request):
         print(codes)
 
         result = ', '.join(f'"{code}"' for code in codes)
-        response, nome_arquivo = execute_sql_and_export_csv(result, regex_id)
+        response, nome_arquivo = execute_sql_and_export_csv(result, regex_id, option)
         context = {'result': result, 'nome_arquivo': nome_arquivo}
 
         return render(request, 'main/extract_code_result.html', context)
 
     return render(request, 'main/extract_code.html', context)
+
+def verificar_erro(request):
+    return render(request, 'main/verificar_erro.html')
 
 
 def download(request, nome_arquivo):
@@ -57,7 +61,7 @@ def download(request, nome_arquivo):
         return HttpResponseServerError(f'Ocorreu um erro: {str(e)}')
 
 
-def query(regex, regex_id):
+def query(regex, regex_id, option):
     data_hoje = datetime.now()
     data_hoje_menos_30_dias = data_hoje - timedelta(days=30)
     data_formatada = data_hoje_menos_30_dias.strftime('%Y-%m-%d')
@@ -67,8 +71,16 @@ def query(regex, regex_id):
     else:
         awbOuNumeroPedido = f'and e.pedido in ({regex})'
 
+    if option == "devolucao":
+        devolucaoOuEntrega = 'and ft.fattar_situacao = "D"'
+    elif option == "entrega":
+        devolucaoOuEntrega = 'and ft.fattar_situacao = "E"'
+    else:
+        devolucaoOuEntrega = ''
+
     sql = f"""
 Select
+    ft.fattar_situacao as 'Situacao',
     cte.fatctestat_id as 'Cod Status',
     status.fatctestat_nome 'Status',
     rem.doc_fiscal_cte as 'Cod CTe_Tipo no cad Rem',
@@ -187,25 +199,27 @@ Select
 From corrier_fat.fat_cte cte
     inner join corrier.encomendas e using(encoid)
     inner join corrier_fat.fat_cte_tributos cteTrib using (fatcte_id)
+	left join corrier_fat.fat_tarifas ft on cteTrib.fattar_id = ft.fattar_id
     inner join corrier_fat.fat_cte_tributos_complemento cteComp using (fatctetrib_id)
     inner join corrier.remetentes rem on e.reid = rem.reid
     inner join corrier_fat.fat_cte_tributos_impostos imp on cteTrib.fatctetrib_id = imp.fatctetrib_id and imp.fatctetribimp_imposto = 'ICMS'
     left JOIN corrier_fat.fat_cte_tributos_impostos icmsuffim on imp.fatctetrib_id = icmsuffim.fatctetrib_id  and icmsuffim.fatctetribimp_imposto = 'ICMSUFFIM'
     left JOIN corrier_fat.fat_cte_tributos_impostos fcpuffim on imp.fatctetrib_id = fcpuffim.fatctetrib_id  and fcpuffim.fatctetribimp_imposto = 'FCPUFFIM'
     left JOIN corrier_fat.fat_cte_tributos_impostos icmsinter on imp.fatctetrib_id = icmsinter.fatctetrib_id  and icmsinter.fatctetribimp_imposto = 'ICMSINTER'
-    inner join corrier_fat.fat_cte_status status using (fatctestat_id)
+    inner join corrier_fat.fat_cte_status status using (fatctestat_id)      
 where 1=1
 	{awbOuNumeroPedido}
     and cteComp.fatctetribcom_motorfiscal = 'IDT'
-    and cte.fatcte_data >= {str(data_formatada)}     
+    and cte.fatcte_data >= {str(data_formatada)}    
+    {devolucaoOuEntrega}
 order by awb
 """
 
     return sql
 
 
-def execute_sql_and_export_csv(regex, regex_id):
-    sql_query = query(regex, regex_id)
+def execute_sql_and_export_csv(regex, regex_id, option):
+    sql_query = query(regex, regex_id, option)
     try:
         with connections['external_database'].cursor() as cursor:
             cursor.execute(sql_query)
@@ -272,9 +286,12 @@ def format_json(request):
 
 
 def texto_para_json(texto):
-    texto = texto.replace("'", '"')
-    texto = texto.replace("True", "true")
-    texto = texto.replace("False", "false")
+    texto = texto.replace("\\n", " ").strip()
+    texto = texto.replace('\\"', " ").strip()
+    texto = texto.replace('\\', " ").strip()
+    texto = texto.replace("'", '"').strip()
+    texto = texto.replace("True", "true").strip()
+    texto = texto.replace("False", "false").strip()
 
     try:
         return json.dumps(json.loads(texto), indent=2)

@@ -16,6 +16,7 @@ urlpatterns = [
 url_main = [
     path('', views.home, name='home'),
     path('extract_code/', views.extract_code, name='extract_code'),
+    path('verificar_erro/', views.verificar_erro, name='verificar_erro'),
     path('download/<str:nome_arquivo>/', views.download, name='download'),
     path('format_json/', views.format_json, name='format_json'),
 ]
