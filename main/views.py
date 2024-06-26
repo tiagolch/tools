@@ -246,10 +246,10 @@ def format_json(request):
         payload = request.POST.get('PAYLOAD', '')
         response = request.POST.get('RESPONSE', '')
         persistencia = request.POST.get('PERSISTENCIA', '')
-        nome_arquivo = request.POST.get('nome_arquivo')
+        awb = request.POST.get('nome_arquivo')
         devolucao = request.POST.get('devolucao')
 
-        nome_arquivo = nome_arquivo + '_devolucao' if devolucao else nome_arquivo + '_normal'
+        nome_arquivo = awb + '_devolucao' if devolucao else awb + '_normal'
 
         nome_api = nome_arquivo + '_api.json'
         nome_payload = nome_arquivo + '_payload.json'
@@ -263,12 +263,12 @@ def format_json(request):
             FormatJson.objects.create(name=nome_api, json=json_api)
             nomes_arquivos.append(nome_api)
         if payload:
-            json_payload = texto_para_json(payload)
+            json_payload = texto_para_json(payload, awb)
             salvar_json_em_arquivo(json_payload, nome_payload)
             FormatJson.objects.create(name=nome_payload, json=json_payload)
             nomes_arquivos.append(nome_payload)
         if response:
-            json_response = texto_para_json(response)
+            json_response = texto_para_json(response, awb)
             salvar_json_em_arquivo(json_response, nome_response)
             FormatJson.objects.create(name=nome_response, json=json_response)
             nomes_arquivos.append(nome_response)
@@ -285,7 +285,7 @@ def format_json(request):
     return render(request, 'main/format_json.html')
 
 
-def texto_para_json(texto):
+def texto_para_json(texto, awb=None):
     texto = texto.replace("\\n", " ").strip()
     texto = texto.replace('\\"', " ").strip()
     texto = texto.replace('\\', " ").strip()
@@ -294,7 +294,14 @@ def texto_para_json(texto):
     texto = texto.replace("False", "false").strip()
 
     try:
-        return json.dumps(json.loads(texto), indent=2)
+        json_formatado = json.loads(texto)
+        if 'documents' in json_formatado:
+            for document in json_formatado['documents']:
+                if 'lines' in document:
+                    for line in document['lines']:
+                        if awb in line['lineNumber']:
+                            return json.dumps(document, indent=2)
+        return json.dumps(json_formatado, indent=2)
     except json.JSONDecodeError:
         print('ERRROOOOOOOOOO')
         texto_corrigido = texto.replace("'", '"')
