@@ -26,10 +26,8 @@ def extract_code(request):
         regex = Regex.objects.get(id=int(regex_id))
 
         schema = re.compile(f"{regex.regex}")
-        #schema2 = re.compile('[A-Za-z]{4}\d+tx')
 
         codes = schema.findall(data)
-        #codes += schema2.findall(data)
         print(codes)
 
         result = ', '.join(f'"{code}"' for code in codes)
@@ -299,7 +297,7 @@ def texto_para_json(texto, awb=None):
             for document in json_formatado['documents']:
                 if 'lines' in document:
                     for line in document['lines']:
-                        if awb in line['lineNumber']:
+                        if awb and awb in line.get('lineNumber', ''):
                             return json.dumps(document, indent=2)
         return json.dumps(json_formatado, indent=2)
     except json.JSONDecodeError:
