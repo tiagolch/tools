@@ -8,23 +8,44 @@
         {% csrf_token %}
         <div class="form-group">
             <label for="API">API:</label>
-            <textarea class="form-control" name="API" rows="4" ></textarea>
+            <textarea 
+                class="form-control" 
+                name="API" 
+                rows="4"
+                placeholder="'id': 597556203, 'data': '2024-06-22', ...">
+            </textarea>
         </div>
         <div class="form-group">
             <label for="PAYLOAD">PAYLOAD:</label>
-            <textarea class="form-control" name="PAYLOAD" rows="4" ></textarea>
+            <textarea 
+                class="form-control" 
+                name="PAYLOAD"
+                placeholder="{'companyRole': 'S', 'uniqueDocumentNumber' ..."
+                rows="4">
+            </textarea>
         </div>
         <div class="form-group">
             <label for="RESPONSE">RESPONSE:</label>
-            <textarea class="form-control" name="RESPONSE" rows="4" ></textarea>
+            <textarea 
+                class="form-control" 
+                name="RESPONSE" 
+                placeholder="{'companyRole': 'S', 'status': {'isSuccess': True ..."
+                rows="4">
+            </textarea>
         </div>
         <div class="form-group">
             <label for="PERSISTENCIA">PERSISTENCIA:</label>
-            <textarea class="form-control" name="PERSISTENCIA" rows="4" ></textarea>
+            <textarea 
+                class="form-control" 
+                name="PERSISTENCIA" 
+                placeholder="{'{'tarifas': [{'id': '597556203', 'valorTributos': 3.93, ..."
+                rows="4">
+            </textarea>
         </div>
         <div class="form-group">
             <label for="nome_arquivo">Nome do Arquivo:</label>
-            <input type="text" class="form-control" name="nome_arquivo" required>
+            <input type="text" class="form-control" name="nome_arquivo"
+                placeholder="Recomendado colar AWB para obter somente o mesmo e nao o lote" required>
         </div>
         <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" name="devolucao" id="devolucao">
