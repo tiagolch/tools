@@ -1,58 +1,44 @@
 {% extends '../base.html' %}
+
 {% block title %}extract code{% endblock %}
 {% block content %}
 
-<div class="text-center">
-    <h1>Formatar JSON</h1>
-    <form method="post" action="{% url 'format_json' %}" class=" align-items-center">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="API">API:</label>
-            <textarea 
-                class="form-control" 
-                name="API" 
-                rows="4"
-                placeholder="'id': 597556203, 'data': '2024-06-22', ...">
-            </textarea>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-sm-12">
+            <div class="form-container">
+                <h1 class="text-center mb-4">Formatar JSON</h1>
+                <form method="post" action="{% url 'format_json' %}" class="align-items-center">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="API">API:</label>
+                        <textarea class="form-control" name="API" rows="2" placeholder="'id': 598088958, 'data' ..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="PAYLOAD">PAYLOAD:</label>
+                        <textarea class="form-control" name="PAYLOAD" rows="2" placeholder="'companyRole': 'S', 'uniqueDocumentNumber' ..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="RESPONSE">RESPONSE:</label>
+                        <textarea class="form-control" name="RESPONSE" rows="2" placeholder="'isSuccess': True, 'isPartialSuccess' ..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="PERSISTENCIA">PERSISTENCIA:</label>
+                        <textarea class="form-control" name="PERSISTENCIA" rows="2" placeholder="'tarifas': [{'id' ..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="nome_arquivo">Nome do Arquivo:</label>
+                        <input type="text" class="form-control" name="nome_arquivo" placeholder="Exemplo: TXAS122292162tx ou TXAS122292162tx.598088965" required>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" name="devolucao" id="devolucao">
+                        <label class="form-check-label" for="devolucao">Devolução?</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Formatar</button>
+                </form>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="PAYLOAD">PAYLOAD:</label>
-            <textarea 
-                class="form-control" 
-                name="PAYLOAD"
-                placeholder="{'companyRole': 'S', 'uniqueDocumentNumber' ..."
-                rows="4">
-            </textarea>
-        </div>
-        <div class="form-group">
-            <label for="RESPONSE">RESPONSE:</label>
-            <textarea 
-                class="form-control" 
-                name="RESPONSE" 
-                placeholder="{'companyRole': 'S', 'status': {'isSuccess': True ..."
-                rows="4">
-            </textarea>
-        </div>
-        <div class="form-group">
-            <label for="PERSISTENCIA">PERSISTENCIA:</label>
-            <textarea 
-                class="form-control" 
-                name="PERSISTENCIA" 
-                placeholder="{'{'tarifas': [{'id': '597556203', 'valorTributos': 3.93, ..."
-                rows="4">
-            </textarea>
-        </div>
-        <div class="form-group">
-            <label for="nome_arquivo">Nome do Arquivo:</label>
-            <input type="text" class="form-control" name="nome_arquivo"
-                placeholder="Recomendado colar AWB para obter somente o mesmo e nao o lote" required>
-        </div>
-        <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" name="devolucao" id="devolucao">
-            <label class="form-check-label" for="devolucao">Devolução?</label>
-        </div>
-        <button type="submit" class="btn btn-primary">Formatar</button>
-    </form>
+    </div>
 </div>
 
 {% endblock %}

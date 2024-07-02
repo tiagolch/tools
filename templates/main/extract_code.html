@@ -3,30 +3,45 @@
 {% block title %}format json{% endblock %}
 {% block content %}
 
-    <div class="container mt-5">
-        <h1>Extrair Massa</h1>
-        <form method="post" action="{% url 'extract_code' %}">
-            {% csrf_token %}
-            <label for="regex">Escolha a expressão regular:</label>
-            <select class="form-control" id="regex" name="regex">
-                {% for regex_item in regex_list %}
-                    <option value="{{ regex_item.id }}">{{ regex_item.name }}</option>
-                {% endfor %}
-            </select>
-            <div class="form-group">
-                <label for="dados">Cole seus dados aqui:</label>
-                <textarea class="form-control" id="data" name="data" rows="10" placeholder="Cole seus dados aqui"></textarea>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-sm-12">
+            <div class="form-container">
+                <h1 class="text-center mb-4">Extrair Massa</h1>
+                <form method="post" action="{% url 'extract_code' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="regex">Escolha a expressão regular:</label>
+                        <select class="form-control" id="regex" name="regex">
+                            {% for regex_item in regex_list %}
+                                <option value="{{ regex_item.id }}">{{ regex_item.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dados">Cole seus dados aqui:</label>
+                        <textarea class="form-control" id="data" name="data" rows="10" placeholder="Cole seus dados aqui"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Opções:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="isAmbos" name="option" value="ambos" checked>
+                            <label class="form-check-label" for="isAmbos">Ambos</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="isDevolucao" name="option" value="devolucao">
+                            <label class="form-check-label" for="isDevolucao">Somente Devolução</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="isEntrega" name="option" value="entrega">
+                            <label class="form-check-label" for="isEntrega">Somente Entrega</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Extrair</button>
+                </form>
             </div>
-            <div>
-                <label for="isAmbos">Ambos?</label>
-                <input type="radio" id="isAmbos" name="option" value="ambos" checked><br/>
-                <label for="isDevolucao">Somente Devolução?</label>
-                <input type="radio" id="isDevolucao" name="option" value="devolucao"><br />
-                <label for="isEntrega">Somente Entrega?</label>
-                <input type="radio" id="isEntrega" name="option" value="entrega">
-            </div>
-            <button type="submit" class="btn btn-primary">Extrair</button>
-        </form>
+        </div>
     </div>
+</div>
 
 {% endblock %}

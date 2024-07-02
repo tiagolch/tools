@@ -284,26 +284,31 @@ def format_json(request):
 
 
 def texto_para_json(texto, awb=None):
-    texto = texto.replace("\\n", " ").strip()
-    texto = texto.replace('\\"', " ").strip()
-    texto = texto.replace('\\', " ").strip()
-    texto = texto.replace("'", '"').strip()
-    texto = texto.replace("True", "true").strip()
-    texto = texto.replace("False", "false").strip()
+    replacements = {
+        "\\n": " ",
+        '\\"': ' ',
+        '\\': ' ',
+        "'": '"',
+        "True": "true",
+        "False": "false"
+    }
+    for old, new in replacements.items():
+        texto = texto.replace(old, new).strip()
 
     try:
         json_formatado = json.loads(texto)
-        if 'documents' in json_formatado:
-            for document in json_formatado['documents']:
-                if 'lines' in document:
-                    for line in document['lines']:
-                        if awb and awb in line.get('lineNumber', ''):
-                            return json.dumps(document, indent=2)
-        return json.dumps(json_formatado, indent=2)
-    except json.JSONDecodeError:
-        print('ERRROOOOOOOOOO')
-        texto_corrigido = texto.replace("'", '"')
-        return json.loads(texto_corrigido)
+    except json.JSONDecodeError as e:
+        print('Error parsing JSON:', e)
+        return json.dumps({"error": "Invalid JSON format"}, indent=2)
+
+    if 'documents' in json_formatado:
+        for document in json_formatado['documents']:
+            if 'lines' in document:
+                for line in document['lines']:
+                    if awb and awb in line.get('lineNumber', ''):
+                        return json.dumps(document, indent=2)
+
+    return json.dumps(json_formatado, indent=2)
 
 
 def salvar_json_em_arquivo(json_string, nome_arquivo='document'):
