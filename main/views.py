@@ -144,6 +144,12 @@ Select
     cte.fatcte_aliquota as 'ICMS Aliquota',
     cte.fatcte_valor_icms as 'ICMS Valor',
     (
+    IF(imp.fatctetribimp_aliquota <> 0, imp.fatctetribimp_aliquota, 0)
+    ) as  'ICMS_IDT Aliquota' ,    
+    (
+    IF(imp.fatctetribimp_valor <> 0, imp.fatctetribimp_valor, 0)
+    ) as  'ICMS_IDT Valor' ,
+    (
     IF(icmsuffim.fatctetribimp_aliquota <> 0, icmsuffim.fatctetribimp_aliquota, 0)
     ) as 'ICMSUFFIM Aliquota',
     (
