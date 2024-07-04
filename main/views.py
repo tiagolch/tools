@@ -156,17 +156,23 @@ Select
     IF(icmsuffim.fatctetribimp_valor <> 0, icmsuffim.fatctetribimp_valor, 0)
     ) as 'ICMSUFFIM Valor',
     (
-    IF(fcpuffim.fatctetribimp_aliquota <> 0, icmsuffim.fatctetribimp_aliquota, 0)
+    IF(fcpuffim.fatctetribimp_aliquota <> 0, fcpuffim.fatctetribimp_aliquota, 0)
     ) as 'FCPUFFIM Aliquota',
     (
-    IF(fcpuffim.fatctetribimp_valor <> 0, icmsuffim.fatctetribimp_valor, 0)
+    IF(fcpuffim.fatctetribimp_valor <> 0, fcpuffim.fatctetribimp_valor, 0)
     ) as 'FCPUFFIM Valor',
     (
-    IF(icmsinter.fatctetribimp_aliquota <> 0, icmsuffim.fatctetribimp_aliquota, 0)
+    IF(icmsinter.fatctetribimp_aliquota <> 0, icmsinter.fatctetribimp_aliquota, 0)
     ) as 'ICMSINTER Aliquota',
     (
-    IF(icmsinter.fatctetribimp_valor <> 0, icmsuffim.fatctetribimp_valor, 0)
+    IF(icmsinter.fatctetribimp_valor <> 0, icmsinter.fatctetribimp_valor, 0)
     ) as 'ICMSINTER Valor',
+    (
+    IF(icmsst.fatctetribimp_aliquota <> 0, icmsst.fatctetribimp_aliquota, 0)
+    ) as 'ICMS-ST Aliquota',
+    (
+    IF(icmsst.fatctetribimp_valor <> 0, icmsst.fatctetribimp_valor, 0)
+    ) as 'ICMS-ST Valor',
     cte.fatcte_valor_mercadoria as 'Valor Mercadoria',
     cte.fatcte_natureza as Natureza,
     cte.fatcte_peso as Peso,
@@ -210,6 +216,7 @@ From corrier_fat.fat_cte cte
     left JOIN corrier_fat.fat_cte_tributos_impostos icmsuffim on imp.fatctetrib_id = icmsuffim.fatctetrib_id  and icmsuffim.fatctetribimp_imposto = 'ICMSUFFIM'
     left JOIN corrier_fat.fat_cte_tributos_impostos fcpuffim on imp.fatctetrib_id = fcpuffim.fatctetrib_id  and fcpuffim.fatctetribimp_imposto = 'FCPUFFIM'
     left JOIN corrier_fat.fat_cte_tributos_impostos icmsinter on imp.fatctetrib_id = icmsinter.fatctetrib_id  and icmsinter.fatctetribimp_imposto = 'ICMSINTER'
+    left JOIN corrier_fat.fat_cte_tributos_impostos icmsst on imp.fatctetrib_id = icmsst.fatctetrib_id  and icmsst.fatctetribimp_imposto = 'ICMS-ST'
     inner join corrier_fat.fat_cte_status status using (fatctestat_id)      
 where 1=1
 	{awbOuNumeroPedido}
