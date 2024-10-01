@@ -78,6 +78,7 @@ def query(regex, regex_id, option):
 
     sql = f"""
 Select
+    ft.fattar_data as 'Data da Tarifa',
     ft.fattar_situacao as 'Situacao',
     cte.fatctestat_id as 'Cod Status',
     status.fatctestat_nome 'Status',
@@ -128,8 +129,8 @@ Select
     fatcte_natureza_operacao as 'Natureza Operacao',
     cte.fatcte_codigo_numerico as 'Codigo Numerico',
     cte.fatcte_serie as 'Serie',
-    cte.fatcte_data as 'Data',
-    cte.fatcte_hora as Hora,
+    cte.fatcte_data as 'Data CTE',
+    cte.fatcte_hora as 'Hora CTE',
     cte.fatcte_municipio_envio as 'Municipio Envio',
     cte.fatcte_municipio_inicio as 'Municipio Inicio',
     cte.fatcte_uf_inicio as 'UF Inicio',
@@ -145,7 +146,7 @@ Select
     cte.fatcte_valor_icms as 'ICMS Valor',
     (
     IF(imp.fatctetribimp_aliquota <> 0, imp.fatctetribimp_aliquota, 0)
-    ) as  'ICMS_IDT Aliquota' ,    
+    ) as  'ICMS_IDT Aliquota' ,
     (
     IF(imp.fatctetribimp_valor <> 0, imp.fatctetribimp_valor, 0)
     ) as  'ICMS_IDT Valor' ,
@@ -217,11 +218,11 @@ From corrier_fat.fat_cte cte
     left JOIN corrier_fat.fat_cte_tributos_impostos fcpuffim on imp.fatctetrib_id = fcpuffim.fatctetrib_id  and fcpuffim.fatctetribimp_imposto = 'FCPUFFIM'
     left JOIN corrier_fat.fat_cte_tributos_impostos icmsinter on imp.fatctetrib_id = icmsinter.fatctetrib_id  and icmsinter.fatctetribimp_imposto = 'ICMSINTER'
     left JOIN corrier_fat.fat_cte_tributos_impostos icmsst on imp.fatctetrib_id = icmsst.fatctetrib_id  and icmsst.fatctetribimp_imposto = 'ICMS-ST'
-    inner join corrier_fat.fat_cte_status status using (fatctestat_id)      
+    inner join corrier_fat.fat_cte_status status using (fatctestat_id)
 where 1=1
 	{awbOuNumeroPedido}
     and cteComp.fatctetribcom_motorfiscal = 'IDT'
-    and cte.fatcte_data >= {str(data_formatada)}    
+    and ft.fattar_data >= {str(data_formatada)}    
     {devolucaoOuEntrega}
 order by awb
 """
